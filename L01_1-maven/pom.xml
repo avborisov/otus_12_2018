@@ -33,46 +33,12 @@
             <version>${org.apache.commons.version}</version>
         </dependency>
 
-        <dependency>
-            <groupId>net.sf.proguard</groupId>
-            <artifactId>proguard-base</artifactId>
-            <version>${tool.proguard.version}</version>
-        </dependency>
-
     </dependencies>
 
     <build>
         <finalName>${project.name}</finalName>
 
         <plugins>
-
-            <!--
-            <plugin>
-                <groupId>com.github.wvengen</groupId>
-                <artifactId>proguard-maven-plugin</artifactId>
-                <version>2.0.13</version>
-                <executions>
-                    <execution>
-                        <phase>package</phase>
-                        <goals><goal>proguard</goal></goals>
-                    </execution>
-                </executions>
-                <configuration>
-                    <obfuscate>true</obfuscate>
-                    <injar>${project.build.finalName}.jar</injar>
-                    <libs>
-                        <lib>${java.home}/lib/rt.jar</lib>
-                    </libs>
-                    <options>
-                        <option>
-                            -keep public class ru.otus.borisov.Main {
-                                public static void main(java.lang.String[]);
-                            }
-                        </option>
-                    </options>
-                </configuration>
-            </plugin>
-            -->
 
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
