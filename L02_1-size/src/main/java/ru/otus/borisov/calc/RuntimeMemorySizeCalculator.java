@@ -4,7 +4,6 @@ import ru.otus.borisov.factory.IObjectFactory;
 
 import java.lang.instrument.Instrumentation;
 
-@Deprecated
 /**
  * We can't believe Runtime get memory results
  */
@@ -12,18 +11,23 @@ public class RuntimeMemorySizeCalculator implements IObjectSizeCalculator {
 
     public long getObjectSize(IObjectFactory factory) {
         try {
-            long memoryBeforeFactory = getMem();
-
             final int arraySize = 20_000_000;
+
+            long memoryBeforeFactory = getMem();
 
             Object[] array = new Object[arraySize];
 
-            for (int i = 0; i < arraySize; i++) {
+            long memoryWithReference = getMem();
+            System.out.println("Reference size: " + (memoryWithReference - memoryBeforeFactory) / arraySize);
+
+            for (int i = 0; i < array.length; i++) {
                 array[i] = factory.getObject();
             }
 
             long memoryAfterFactory = getMem();
-            long singleObjectSize = (memoryAfterFactory - memoryBeforeFactory) / arraySize;
+            long singleObjectSize = (memoryAfterFactory - memoryWithReference) / arraySize;
+
+            System.out.println("Object size: " + singleObjectSize);
 
             array = null;
 
