@@ -3,30 +3,45 @@ package ru.otus.borisov;
 import ru.otus.borisov.calc.InstrumentationSizeCalculator;
 import ru.otus.borisov.calc.RuntimeMemorySizeCalculator;
 import ru.otus.borisov.factory.ArrayListFactory;
+import ru.otus.borisov.factory.PrimitiveArrayFactory;
 import ru.otus.borisov.factory.StringFactory;
 
 public class Main {
 
     public static void main(String[] args) {
 
-        //RuntimeMemorySizeCalculator calculator = new RuntimeMemorySizeCalculator();
-        InstrumentationSizeCalculator calculator = new InstrumentationSizeCalculator();
+        RuntimeMemorySizeCalculator calculator = new RuntimeMemorySizeCalculator();
+        //InstrumentationSizeCalculator calculator = new InstrumentationSizeCalculator();
 
-        StringFactory emptyStringFactory = new StringFactory(true);
-        long emptyStringSize = calculator.getObjectSize(emptyStringFactory);
-        System.out.println("Size of empty String: " + emptyStringSize);
+        System.out.println();
+        System.out.println("----------------------------------------------");
+        System.out.println("empty String");
+        System.out.println("Size of empty String: " + calculator.getObjectSize(new StringFactory(true)));
 
-        StringFactory stringFactory = new StringFactory(true);
-        long stringSize = calculator.getObjectSize(stringFactory);
-        System.out.println("Size of String: " + stringSize);
+        System.out.println();
+        System.out.println("----------------------------------------------");
+        System.out.println("Lorem ipsum String");
+        System.out.println("Size of Lorem ipsum String: " + calculator.getObjectSize(new StringFactory(false)));
 
-        ArrayListFactory<Integer> emptyArrayListFactory = new ArrayListFactory<Integer>(Integer.class);
-        long emptyArrayListSize = calculator.getObjectSize(emptyArrayListFactory);
-        System.out.println("Size of empty ArrayList: " + emptyArrayListSize);
+        System.out.println();
+        System.out.println("----------------------------------------------");
+        System.out.println("empty ArrayList");
+        System.out.println("Size of empty ArrayList: " + calculator.getObjectSize(new ArrayListFactory<Integer>(Integer.class)));
 
-        ArrayListFactory<Integer> IntegerArrayListFactory = new ArrayListFactory<Integer>(Integer.class, 1, 2, 3);
-        long arrayListSize = calculator.getObjectSize(IntegerArrayListFactory);
-        System.out.println("Size of ArrayList with Integer objects: " + arrayListSize);
+        System.out.println();
+        System.out.println("----------------------------------------------");
+        System.out.println("ArrayList with Integer object");
+        System.out.println("Size of ArrayList with Integer objects: " + calculator.getObjectSize(new ArrayListFactory<Integer>(Integer.class, 1, 2, 3)));
+
+        System.out.println();
+        System.out.println("----------------------------------------------");
+        System.out.println("Empty int array");
+        System.out.println("Size of empty int array: " + calculator.getObjectSize(new PrimitiveArrayFactory(true)));
+
+        System.out.println();
+        System.out.println("----------------------------------------------");
+        System.out.println("int array");
+        System.out.println("Size of int array: " + calculator.getObjectSize(new PrimitiveArrayFactory(false)));
     }
 
 }

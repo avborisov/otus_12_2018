@@ -9,10 +9,10 @@ import java.lang.instrument.Instrumentation;
  */
 public class RuntimeMemorySizeCalculator implements IObjectSizeCalculator {
 
+    private static final int arraySize = 20_000_000;
+
     public long getObjectSize(IObjectFactory factory) {
         try {
-            final int arraySize = 20_000_000;
-
             long memoryBeforeFactory = getMem();
 
             Object[] array = new Object[arraySize];
