@@ -32,7 +32,7 @@ public class RuntimeMemorySizeCalculator implements IObjectSizeCalculator {
             array = null;
 
             System.gc();
-            Thread.sleep(1000);
+            Thread.sleep(10);
 
             return singleObjectSize;
 
