@@ -53,14 +53,14 @@ class MyArrayList<T> implements List<T> {
                 if (!removeAllowed) {
                     throw new IllegalStateException();
                 }
-                MyArrayList.this.remove(currentPos);
+                MyArrayList.this.remove(currentPos.intValue());
                 removeAllowed = false;
             }
 
             @Override
             public boolean hasNext() {
                 int nextPos = currentPos == null ? 0 : currentPos + 1;
-                if (nextPos < list.length) {
+                if (nextPos < size) {
                     return true;
                 }
                 return false;
@@ -143,21 +143,14 @@ class MyArrayList<T> implements List<T> {
 
     @Override
     public boolean addAll(int index, Collection<? extends T> c) {
-        size = size + c.size();
-        expandIfNeed();
-
-        Object[] tail = new Object[list.length - index];
+        Object[] tail = new Object[size - index];
         System.arraycopy(list, index, tail, 0, tail.length);
+        size = index;
 
-        Iterator<? extends T> it = c.iterator();
-        while (it.hasNext()) {
-            T object = it.next();
-            list[index++] = object;
-        }
+        addAll(c);
 
-        int tailIndex = 0;
-        for (int i = index; i < index + tail.length; i++) {
-            list[i] = tail[tailIndex++];
+        for (int i = 0; i < tail.length; i++) {
+            add((T) tail[i]);
         }
 
         return true;

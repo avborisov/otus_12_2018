@@ -34,6 +34,9 @@ public class Main {
             }
         });
         System.out.println(myList);
+
+        myList.addAll(1, myListCopy);
+        System.out.println(myList);
     }
 
 }
