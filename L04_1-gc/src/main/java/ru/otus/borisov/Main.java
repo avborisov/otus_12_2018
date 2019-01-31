@@ -1,67 +1,67 @@
 package ru.otus.borisov;
 
+import com.sun.management.GarbageCollectionNotificationInfo;
+
+import javax.management.Notification;
+import javax.management.NotificationEmitter;
+import javax.management.NotificationListener;
+import javax.management.openmbean.CompositeData;
 import java.lang.management.GarbageCollectorMXBean;
 import java.lang.management.ManagementFactory;
 import java.util.*;
 
 public class Main {
 
-    static final Set<String> YOUNG_GC = new HashSet<String>(3);
-    static final Set<String> OLD_GC = new HashSet<>(3);
+    //keep a count of the total time spent in GCs
+    private static long totalGcDuration = 0;
+    private static long minorCount = 0;
+    private static long minorTime = 0;
+    private static long majorCount = 0;
+    private static long majorTime = 0;
 
-    static long startTime;
+    private static long startTime;
 
-    static {
-        // young generation GC names
-        YOUNG_GC.add("PS Scavenge");
-        YOUNG_GC.add("ParNew");
-        YOUNG_GC.add("Copy");
-        YOUNG_GC.add("G1 Young Generation");
+    private static void installGCMonitoring(){
+        List<GarbageCollectorMXBean> gcbeans = ManagementFactory.getGarbageCollectorMXBeans();
 
-        // old generation GC names
-        OLD_GC.add("PS MarkSweep");
-        OLD_GC.add("ConcurrentMarkSweep");
-        OLD_GC.add("MarkSweepCompact");
-        OLD_GC.add("G1 Old Generation");
+        for (GarbageCollectorMXBean gcbean : gcbeans) {
+            NotificationEmitter emitter = (NotificationEmitter) gcbean;
+            NotificationListener listener = new NotificationListener() {
+
+                @Override
+                public void handleNotification(Notification notification, Object handback) {
+                    //we only handle GARBAGE_COLLECTION_NOTIFICATION notifications here
+                    if (notification.getType().equals(GarbageCollectionNotificationInfo.GARBAGE_COLLECTION_NOTIFICATION)) {
+
+                        GarbageCollectionNotificationInfo info = GarbageCollectionNotificationInfo.from((CompositeData) notification.getUserData());
+                        //get all the info and pretty print it
+                        long duration = info.getGcInfo().getDuration();
+                        String gctype = info.getGcAction();
+                        if ("end of minor GC".equals(gctype)) {
+                            minorCount++;
+                            minorTime += duration;
+                        } else if ("end of major GC".equals(gctype)) {
+                            majorCount++;
+                            majorTime += duration;
+                        }
+                        totalGcDuration += duration;
+                    }
+                }
+            };
+
+            //Add the listener
+            emitter.addNotificationListener(listener, null, null);
+        }
     }
 
     private static void printGCMetrics() {
-
-        long minorCount = 0;
-        long minorTime = 0;
-        long majorCount = 0;
-        long majorTime = 0;
-        long unknownCount = 0;
-        long unknownTime = 0;
-
-        List<GarbageCollectorMXBean> mxBeans = ManagementFactory.getGarbageCollectorMXBeans();
-
-        for (GarbageCollectorMXBean gc : mxBeans) {
-            long count = gc.getCollectionCount();
-            if (count >= 0) {
-                if (YOUNG_GC.contains(gc.getName())) {
-                    minorCount += count;
-                    minorTime += gc.getCollectionTime();
-                } else if (OLD_GC.contains(gc.getName())) {
-                    majorCount += count;
-                    majorTime += gc.getCollectionTime();
-                } else {
-                    unknownCount += count;
-                    unknownTime += gc.getCollectionTime();
-                }
-            }
-        }
 
         StringBuilder sb = new StringBuilder();
         sb.append("YoungGC -> Count: ").append(minorCount)
                 .append(", Time (ms): ").append(minorTime)
                 .append(", OldGC -> Count: ").append(majorCount)
-                .append(", Time (ms): ").append(majorTime);
-
-        if (unknownCount > 0) {
-            sb.append(", UnknownGC -> Count: ").append(unknownCount)
-                    .append(", Time (ms): ").append(unknownTime);
-        }
+                .append(", Time (ms): ").append(majorTime)
+                .append(", Total GC time (ms): ").append(totalGcDuration);
 
         long endTime = System.nanoTime();
         double secondsTime = (endTime - startTime) / 60_000_000_000.0;
@@ -72,35 +72,21 @@ public class Main {
 
     public static void main(String[] args) throws InterruptedException {
         startTime = System.nanoTime();
-        int initialSize = 1_000_000;
+        int elementsInIteration = 100;
 
-        Timer timer = new Timer();
-        PrintGCStat task = new PrintGCStat();
-
-        timer.schedule(task,0,1000);
+        installGCMonitoring();
 
         try {
+            List<String> list = new ArrayList<>();
             while (true) {
-                String[] array = new String[initialSize];
-                for (int i = 0; i < array.length; i++) {
-                    array[i] = new String(String.valueOf(new Date().getTime()));
-                    if (i % 2 == 0 || i % 3 == 0 || i % 5 == 0) {
-                        array[i] = null;
-                    }
-                    if (i % 1_000 == 0) {
-                        Thread.sleep(10);
-                    }
+                for (int i = 0; i < elementsInIteration; i++) {
+                    list.add(new String(String.valueOf(System.nanoTime())));
                 }
-                System.out.println("Have not OutOfSpace Error, increase array size on 10");
-                initialSize = initialSize * 10;
+                for (int i = 0; i < elementsInIteration / 3; i++) {
+                    list.remove(0);
+                }
             }
         } finally {
-            timer.cancel();
-        }
-    }
-
-    public static class PrintGCStat extends TimerTask {
-        public void run() {
             printGCMetrics();
         }
     }
