@@ -7,12 +7,12 @@ public class ApplicationTest {
     private Integer counter;
 
     @BeforeAll
-    public void initSomething() {
+    public static void initSomething() {
         System.out.println("Something initiated!");
     }
 
     @AfterAll
-    public void destroySomething() {
+    public static void destroySomething() {
         System.out.println("Something destroyed!");
     }
 
@@ -23,9 +23,10 @@ public class ApplicationTest {
     }
 
     @Test
-    public void testSecond() {
+    public void testSecond() throws Exception {
         System.out.println("Test number two!");
         counter+=2;
+        throw new Exception("fail");
     }
 
     @Test
