@@ -18,23 +18,21 @@ public class TestRunner {
         List<Method> afterEachMethods = getMethodsAnnotatedWith(clazz, AfterEach.class);
         List<Method> testMethods = getMethodsAnnotatedWith(clazz, Test.class);
 
-        Object o;
-
         // Run before all methods:
-        o = clazz.getConstructor().newInstance();
-        invokeMethodsOfClass(clazz, o, beforeAllMethods);
+        Object beforeAllObject = clazz.getConstructor().newInstance();
+        invokeMethodsOfClass(clazz, beforeAllObject, beforeAllMethods);
 
         // Run test methods with beforeEach/afterEach:
         for (final Method method : testMethods) {
-            o = clazz.getConstructor().newInstance();
-            invokeMethodsOfClass(clazz, o, beforeEachMethods);
-            invokeMethodOfClass(clazz, o, method);
-            invokeMethodsOfClass(clazz, o, afterEachMethods);
+            Object testObject = clazz.getConstructor().newInstance();
+            invokeMethodsOfClass(clazz, testObject, beforeEachMethods);
+            invokeMethodOfClass(clazz, testObject, method);
+            invokeMethodsOfClass(clazz, testObject, afterEachMethods);
         }
 
         // Run after all methods:
-        o = clazz.getConstructor().newInstance();
-        invokeMethodsOfClass(clazz, o, afterAllMethods);
+        Object afterAllObject = clazz.getConstructor().newInstance();
+        invokeMethodsOfClass(clazz, afterAllObject, afterAllMethods);
     }
 
     private static void invokeMethodsOfClass(Class clazz, Object o, List<Method> beforeAllMethods) throws IllegalAccessException, InvocationTargetException {
