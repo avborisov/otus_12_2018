@@ -1,0 +1,8 @@
+package ru.otus.borisov.jtest.annotations;
+
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+
+@Retention(value = RetentionPolicy.RUNTIME)
+public @interface BeforeEach {
+}
