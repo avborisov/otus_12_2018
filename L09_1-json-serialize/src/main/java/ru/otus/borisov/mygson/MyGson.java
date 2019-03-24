@@ -26,6 +26,8 @@ public class MyGson {
             sb.append("\"").append(field.getName()).append("\"").append(":");
             if (field.getType().isPrimitive()) {
                 appendPrimitiveValue(sb, field, value);
+            } else if (field.getType().isArray()) {
+                appendArrayValue(sb, value);
             } else if (value instanceof Collection) {
                 appendCollection(sb, (Collection) value);
             } else if (value instanceof Map) {
@@ -108,6 +110,18 @@ public class MyGson {
         while (it.hasNext()) {
             Object collectionObject = it.next();
             sb.append(toJson(collectionObject));
+            sb.append(",");
+        }
+        sb.deleteCharAt(sb.length() - 1);
+        sb.append("]");
+    }
+
+    private void appendArrayValue(StringBuilder sb, Object value) throws IllegalAccessException {
+        sb.append("[");
+        int length = Array.getLength(value);
+        for (int i = 0; i < length; i++) {
+            Object arrayElement = Array.get(value, i);
+            sb.append(toJson(arrayElement));
             sb.append(",");
         }
         sb.deleteCharAt(sb.length() - 1);
