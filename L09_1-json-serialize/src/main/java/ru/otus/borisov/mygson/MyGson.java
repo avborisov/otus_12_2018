@@ -21,7 +21,7 @@ public class MyGson {
 
             field.setAccessible(true);
             Object value = field.get(object);
-            if (value == null) break;
+            if (value == null) continue;
 
             sb.append("\"").append(field.getName()).append("\"").append(":");
             if (field.getType().isPrimitive()) {
