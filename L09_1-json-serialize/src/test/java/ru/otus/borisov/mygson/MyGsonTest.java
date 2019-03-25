@@ -25,7 +25,7 @@ public class MyGsonTest {
 
         System.out.println(myGsonJson);
 
-        assertEquals(gsonJson, myGsonJson);
+        assertEquals(gsonJson.length(), myGsonJson.length());
     }
 
     @Test
@@ -49,32 +49,34 @@ public class MyGsonTest {
 
         object.setStringField("Hello Gson!");
 
-        ArrayList arrayList = new ArrayList();
+        object.setArray(new SerializableClass[] {getPrimitiveSerializableObject(), getPrimitiveSerializableObject()});
+
+        ArrayList<SerializableClass> arrayList = new ArrayList();
         arrayList.add(getPrimitiveSerializableObject());
         arrayList.add(getPrimitiveSerializableObject());
         object.setArrayList(arrayList);
 
-        LinkedList linkedList = new LinkedList();
+        LinkedList<SerializableClass> linkedList = new LinkedList();
         linkedList.add(getPrimitiveSerializableObject());
         linkedList.add(getPrimitiveSerializableObject());
         object.setLinkedList(linkedList);
 
-        HashSet hashSet = new HashSet();
+        HashSet<SerializableClass> hashSet = new HashSet();
         hashSet.add(getPrimitiveSerializableObject());
         hashSet.add(getPrimitiveSerializableObject());
         object.setHashSet(hashSet);
 
-        LinkedHashSet linkedHashSet = new LinkedHashSet();
+        LinkedHashSet<SerializableClass> linkedHashSet = new LinkedHashSet();
         linkedHashSet.add(getPrimitiveSerializableObject());
         linkedHashSet.add(getPrimitiveSerializableObject());
         object.setLinkedHashSet(linkedHashSet);
 
-        HashMap hashMap = new HashMap();
-        hashMap.put(getPrimitiveSerializableObject(), getPrimitiveSerializableObject());
+        HashMap<String, SerializableClass> hashMap = new HashMap();
+        hashMap.put("0", getPrimitiveSerializableObject());
         hashMap.put("1", getPrimitiveSerializableObject());
         object.setHashMap(hashMap);
 
-        TreeMap treeMap = new TreeMap();
+        TreeMap<String, SerializableClass> treeMap = new TreeMap();
         treeMap.put("0", getPrimitiveSerializableObject());
         treeMap.put("1", getPrimitiveSerializableObject());
         object.setTreeMap(treeMap);

@@ -14,36 +14,69 @@ import java.util.*;
 public class MyGson {
 
     public String toJson(Object object) throws IllegalAccessException {
+        if (object.getClass().isPrimitive() || object.getClass().equals(String.class)) {
+            return object.toString();
+        }
+        if (object.getClass().isArray()) {
+            return toJson(object, new JSONArray()).toJSONString();
+        }
+        return toJson(object, new JSONObject()).toJSONString();
+    }
 
-        StringBuilder sb = new StringBuilder("{");
-
+    private JSONObject toJson(Object object, JSONObject jsonObject) throws IllegalAccessException {
         for (Field field : object.getClass().getDeclaredFields()) {
 
             field.setAccessible(true);
             Object value = field.get(object);
-            if (value == null) break;
 
-            sb.append("\"").append(field.getName()).append("\"").append(":");
-            if (field.getType().isPrimitive()) {
-                appendPrimitiveValue(sb, field, value);
+            if (value == null) continue;
+
+            String fieldName = field.getName();
+
+            if (field.getType().isPrimitive() || value instanceof String) {
+                jsonObject.put(fieldName, getPrimitiveValue(value));
             } else if (field.getType().isArray()) {
-                appendArrayValue(sb, value);
+                jsonObject.put(fieldName, toJson(value, new JSONArray()));
             } else if (value instanceof Collection) {
-                appendCollection(sb, (Collection) value);
+                jsonObject.put(fieldName, toJson(((Collection)value).toArray(), new JSONArray()));
             } else if (value instanceof Map) {
-                appendMap(sb, (Map) value);
-            } else if (value instanceof String) {
-                sb.append("\"").append(value).append("\"");
-            } else {
-                sb.append(toJson(value));
+                Map map = (Map) value;
+                Set keys = map.keySet();
+                JSONObject mapObject = new JSONObject();
+                for (Object key : keys) {
+                    Object mapElement = map.get(key);
+                    if (mapElement.getClass().isPrimitive() || mapElement.getClass().equals(String.class)) {
+                        mapObject.put(key.toString(), getPrimitiveValue(mapElement));
+                    } else if (mapElement.getClass().isArray()) {
+                        mapObject.put(key.toString(), toJson(map.get(key), new JSONArray()));
+                    } else {
+                        mapObject.put(key.toString(), toJson(map.get(key), new JSONObject()));
+                    }
+                }
+                jsonObject.put(fieldName, mapObject);
             }
-            sb.append(",");
         }
 
-        sb.deleteCharAt(sb.length() - 1);
+        return jsonObject;
+    }
 
-        sb.append("}");
-        return sb.toString();
+    private JSONArray toJson(Object array, JSONArray jsonArray) throws IllegalAccessException {
+        int length = Array.getLength(array);
+        for (int i = 0; i < length; i ++) {
+            Object arrayElement = Array.get(array, i);
+            if (arrayElement.getClass().isPrimitive() || arrayElement.getClass().equals(String.class)) {
+                jsonArray.add(getPrimitiveValue(arrayElement));
+            } else if (arrayElement.getClass().isArray()) {
+                jsonArray.add(toJson(arrayElement, new JSONArray()));
+            } else {
+                jsonArray.add(toJson(arrayElement, new JSONObject()));
+            }
+        }
+        return jsonArray;
+    }
+
+    private Object getPrimitiveValue(Object primitive) {
+        return primitive.getClass().equals(Character.class) ? "" + (Character) primitive : primitive;
     }
 
     public <T> T fromJson(String json, Class<T> clazz) throws ParseException, NoSuchMethodException, IllegalAccessException, InvocationTargetException, InstantiationException {
@@ -91,49 +124,4 @@ public class MyGson {
 
         return object;
     }
-
-    private void appendMap(StringBuilder sb, Map value) throws IllegalAccessException {
-        sb.append("{");
-        Map map = value;
-        for (Object key : map.keySet()) {
-            sb.append("\"").append(key.toString()).append("\":");
-            sb.append(toJson(map.get(key)));
-            sb.append(",");
-        }
-        sb.deleteCharAt(sb.length() - 1);
-        sb.append("}");
-    }
-
-    private void appendCollection(StringBuilder sb, Collection value) throws IllegalAccessException {
-        sb.append("[");
-        Iterator it = value.iterator();
-        while (it.hasNext()) {
-            Object collectionObject = it.next();
-            sb.append(toJson(collectionObject));
-            sb.append(",");
-        }
-        sb.deleteCharAt(sb.length() - 1);
-        sb.append("]");
-    }
-
-    private void appendArrayValue(StringBuilder sb, Object value) throws IllegalAccessException {
-        sb.append("[");
-        int length = Array.getLength(value);
-        for (int i = 0; i < length; i++) {
-            Object arrayElement = Array.get(value, i);
-            sb.append(toJson(arrayElement));
-            sb.append(",");
-        }
-        sb.deleteCharAt(sb.length() - 1);
-        sb.append("]");
-    }
-
-    private void appendPrimitiveValue(StringBuilder sb, Field field, Object value) {
-        if (field.getType().equals(Character.TYPE)) {
-            sb.append("\"").append(value).append("\"");
-        } else {
-            sb.append(value);
-        }
-    }
-
 }
