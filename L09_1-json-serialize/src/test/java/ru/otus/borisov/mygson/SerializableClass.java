@@ -12,6 +12,7 @@ class SerializableClass implements Comparable {
     private float floatField;
     private double doubleField;
 
+    private Object nullValue;
     private String stringField;
     private Object[] array;
 

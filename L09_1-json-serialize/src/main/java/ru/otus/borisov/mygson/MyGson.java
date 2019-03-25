@@ -27,7 +27,6 @@ public class MyGson {
 
             field.setAccessible(true);
             Object value = field.get(object);
-
             if (value == null) continue;
 
             String fieldName = field.getName();
