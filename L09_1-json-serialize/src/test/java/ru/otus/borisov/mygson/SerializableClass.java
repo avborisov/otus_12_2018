@@ -14,14 +14,14 @@ class SerializableClass implements Comparable {
 
     private Object nullValue;
     private String stringField;
-    private Object[] array;
+    private SerializableClass[] array;
 
-    private ArrayList arrayList;
-    private LinkedList linkedList;
-    private HashSet hashSet;
-    private LinkedHashSet linkedHashSet;
-    private HashMap hashMap;
-    private TreeMap treeMap;
+    private ArrayList<SerializableClass> arrayList;
+    private LinkedList<SerializableClass> linkedList;
+    private HashSet<SerializableClass> hashSet;
+    private LinkedHashSet<SerializableClass> linkedHashSet;
+    private HashMap<String, SerializableClass> hashMap;
+    private TreeMap<String, SerializableClass> treeMap;
 
     public boolean isBooleanField() {
         return booleanField;
@@ -87,11 +87,9 @@ class SerializableClass implements Comparable {
         this.stringField = stringField;
     }
 
-    public Object[] getArray() {
-        return array;
-    }
+    public SerializableClass[] getArray() { return array; }
 
-    public void setArray(Object[] array) {
+    public void setArray(SerializableClass[] array) {
         this.array = array;
     }
 

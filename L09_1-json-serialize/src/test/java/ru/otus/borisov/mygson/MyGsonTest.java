@@ -39,7 +39,8 @@ public class MyGsonTest {
 
         MyGson myGson = new MyGson();
         String myGsonJson = myGson.toJson(object);
-        SerializableClass desirializedByMyGson = myGson.fromJson(myGsonJson, SerializableClass.class);
+
+        SerializableClass desirializedByMyGson = (SerializableClass) myGson.fromJson(myGsonJson, SerializableClass.class);
 
         assertTrue(desirializedByGson.equals(desirializedByMyGson));
     }
@@ -63,11 +64,9 @@ public class MyGsonTest {
 
         HashSet<SerializableClass> hashSet = new HashSet();
         hashSet.add(getPrimitiveSerializableObject());
-        hashSet.add(getPrimitiveSerializableObject());
         object.setHashSet(hashSet);
 
         LinkedHashSet<SerializableClass> linkedHashSet = new LinkedHashSet();
-        linkedHashSet.add(getPrimitiveSerializableObject());
         linkedHashSet.add(getPrimitiveSerializableObject());
         object.setLinkedHashSet(linkedHashSet);
 
