@@ -1,0 +1,98 @@
+<html>
+<head>
+    <title>Users</title>
+</head>
+<body>
+<form name="create">
+    <fieldset>
+        <legend>User creation:</legend>
+        <dl>
+            <dt>Name: </dt>
+            <dd><input id="create_user_name" type="text" name="name"/></dd>
+        </dl>
+        <dl>
+            <dt>Age: </dt>
+            <dd><input id="create_user_age" type="number" name="age"/></dd>
+        </dl>
+        <button onclick="createUser()">Save</button>
+    </fieldset>
+</form>
+
+<fieldset>
+    <legend>Get user name:</legend>
+    <dl>
+        <dt>Id: </dt>
+        <dd><input id="user_id" type="number" name="id"/></dd>
+    </dl>
+    <dl>
+        <dt>Name: </dt>
+        <dd><input id="user_name" type="text" name="user_name"/></dd>
+    </dl>
+    <button onclick="loadUserName()">Search</button>
+</fieldset>
+
+<label for="total">Total users:</label>
+<span id="total"></span>
+
+<script>
+    loadTotalUsers();
+
+    function createUser() {
+        var body = 'name=' + encodeURIComponent(document.getElementById("create_user_name").value) +
+            '&age=' + encodeURIComponent(document.getElementById("create_user_age").value);
+        var xhr = new XMLHttpRequest();
+        xhr.open("POST", "/user");
+
+        xhr.onreadystatechange = function() {
+            if(xhr.readyState == XMLHttpRequest.DONE) {
+                if (xhr.status == 201) {
+                    var total = Number.parseInt(document.getElementById("total").textContent);
+                    document.getElementById("total").textContent = total + 1
+                } else {
+                    alert('Error ' + xhr.status + ': ' + xhr.statusText);
+                }
+            }
+        };
+
+        xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+        xhr.send(body);
+    }
+
+    function loadTotalUsers() {
+        var xhr = new XMLHttpRequest();
+
+        xhr.open('GET', 'userTotal', false);
+        xhr.send();
+
+        if (xhr.status != 200) {
+            alert('Error ' + xhr.status + ': ' + xhr.statusText);
+        } else {
+            document.getElementById("total").textContent = xhr.responseText;
+        }
+    }
+
+    function loadUserName() {
+        var userId = document.getElementById("user_id").value;
+        if (!userId) {
+            return;
+        }
+
+        var xhr = new XMLHttpRequest();
+
+        xhr.open('GET', 'user?id=' + userId, false);
+        xhr.send();
+
+        if (xhr.status != 200) {
+            alert('Error ' + xhr.status + ': ' + xhr.statusText);
+        } else {
+            var userJson = JSON.parse(xhr.responseText);
+            if (userJson != null) {
+                document.getElementById("user_name").value = userJson.name;
+            } else {
+                document.getElementById("user_name").value = "NOT FOUND";
+            }
+        }
+    }
+</script>
+</body>
+</html>
