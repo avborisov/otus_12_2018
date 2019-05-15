@@ -7,7 +7,7 @@ import java.util.Random;
 
 public class IntegerArraySorterTest {
 
-    private static int ARRAY_SIZE = 1000000;
+    private static int ARRAY_SIZE = 3000000;
     private static int[] array = new int[ARRAY_SIZE];
 
     @BeforeClass
@@ -27,7 +27,7 @@ public class IntegerArraySorterTest {
         long endTime = System.nanoTime();
 
         long duration = (endTime - startTime);
-        System.out.println("Multi thread sort duration: " + duration);
+        System.out.println("Single thread sort duration: " + duration);
     }
 
     @Test
@@ -39,7 +39,7 @@ public class IntegerArraySorterTest {
         long endTime = System.nanoTime();
 
         long duration = (endTime - startTime);
-        System.out.println("Single thread sort duration: " + duration);
+        System.out.println("Multi thread sort duration: " + duration);
     }
 
     @Test

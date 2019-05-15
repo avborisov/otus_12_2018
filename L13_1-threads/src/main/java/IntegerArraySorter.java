@@ -1,4 +1,5 @@
-import org.apache.commons.lang3.ArrayUtils;
+import java.util.ArrayList;
+import java.util.List;
 
 public class IntegerArraySorter {
 
@@ -14,7 +15,14 @@ public class IntegerArraySorter {
     }
 
     public int[] sortSingleThread() {
-        doSortSingleThread(0, array.length - 1);
+        List<Limit> limits = doSortSingleThread(0, array.length - 1);
+        while (limits.size() > 0) {
+            List<Limit> afterSortIterationLims = new ArrayList<Limit>();
+            for (Limit limit : limits) {
+                afterSortIterationLims.addAll(doSortSingleThread(limit.getBegin(), limit.getEnd()));
+            }
+            limits = afterSortIterationLims;
+        }
         return array;
     }
 
@@ -28,13 +36,27 @@ public class IntegerArraySorter {
 
         Thread thLeft = new Thread() {
             public void run() {
-                doSortSingleThread(start, finalCur);
+                List<Limit> limits = doSortSingleThread(start, finalCur);
+                while (limits.size() > 0) {
+                    List<Limit> afterSortIterationLims = new ArrayList<Limit>();
+                    for (Limit limit : limits) {
+                        afterSortIterationLims.addAll(doSortSingleThread(limit.getBegin(), limit.getEnd()));
+                    }
+                    limits = afterSortIterationLims;
+                }
             }
         };
 
         Thread thRight = new Thread() {
             public void run() {
-                doSortSingleThread(finalCur + 1, end);
+                List<Limit> limits = doSortSingleThread(finalCur + 1, end);
+                while (limits.size() > 0) {
+                    List<Limit> afterSortIterationLims = new ArrayList<Limit>();
+                    for (Limit limit : limits) {
+                        afterSortIterationLims.addAll(doSortSingleThread(limit.getBegin(), limit.getEnd()));
+                    }
+                    limits = afterSortIterationLims;
+                }
             }
         };
 
@@ -49,14 +71,22 @@ public class IntegerArraySorter {
         }
     }
 
-    private void doSortSingleThread(final int start, final int end) {
-        if (start >= end)
-            return;
+    private List<Limit> doSortSingleThread(final int start, final int end) {
         int i = start, j = end;
         int cur = i - (i - j) / 2;
         cur = sort(i, j, cur);
-        doSortSingleThread(start, cur);
-        doSortSingleThread(cur+1, end);
+
+        List<Limit> result = new ArrayList<Limit>();
+        if (start < cur) {
+            Limit lim = new Limit(start, cur);
+            result.add(lim);
+        }
+
+        if (cur + 1 < end) {
+            Limit lim = new Limit(cur + 1, end);
+            result.add(lim);
+        }
+        return result;
     }
 
     private int sort(int i, int j, int cur) {
@@ -82,6 +112,25 @@ public class IntegerArraySorter {
 
     public int[] getArray() {
         return array;
+    }
+
+    private class Limit {
+
+        private int begin;
+        private int end;
+
+        public Limit(int begin, int end) {
+            this.begin = begin;
+            this.end = end;
+        }
+
+        public int getBegin() {
+            return begin;
+        }
+
+        public int getEnd() {
+            return end;
+        }
     }
 
 }
