@@ -3,14 +3,14 @@ package ru.otus.borisov;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
-public class CounterThreadTest {
+public class LockThreadTest {
 
     Lock lock;
 
-    public CounterThreadTest(int threadNumber) {
+    public LockThreadTest() {
         lock = new ReentrantLock();
 
-        for (int i = 0; i < threadNumber; i++) {
+        for (int i = 0; i < 2; i++) {
             CounterThread t = new CounterThread();
             t.start();
         }
@@ -34,7 +34,7 @@ public class CounterThreadTest {
         try {
             Thread.sleep(10);
         } catch (InterruptedException e) {
-            e.printStackTrace();
+            System.out.println("concurrence error");
         }
     }
 
